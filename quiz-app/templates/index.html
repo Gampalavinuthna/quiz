@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .question p {
+      font-weight: bold;
+    }
+    #submitBtn {
+      background: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #submitBtn:hover {
+      background: #45a049;
+    }
+    #timer {
+      float: right;
+      color: #ff0000;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📘 Quiz Time <span id="timer">Time: 30s</span></h2>
+    <form id="quizForm"></form>
+    <button id="submitBtn">Submit</button>
+    <h3 id="result"></h3>
+  </div>
+
+  <script>
+    const form = document.getElementById('quizForm');
+    const result = document.getElementById('result');
+    const timerSpan = document.getElementById('timer');
+
+    let questions = [];
+
+    fetch('/questions')
+      .then(res => res.json())
+      .then(data => {
+        questions = data;
+        displayQuestions();
+        startTimer();
+      });
+
+    function displayQuestions() {
+      let html = '';
+      questions.forEach((q, index) => {
+        html += <div class="question">;
+        html += <p>${index + 1}. ${q.question}</p>;
+        q.options.forEach(opt => {
+          html += <label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>;
+        });
+        html += </div>;
+      });
+      form.innerHTML = html;
+    }
+
+    document.getElementById('submitBtn').onclick = function(e) {
+      e.preventDefault();
+      calculateScore();
+    };
+
+    function calculateScore() {
+      let score = 0;
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(input[name="q${index}"]:checked);
+        if (selected && selected.value === q.answer) {
+          score++;
+        }
+      });
+      result.innerHTML = ✅ You scored ${score} out of ${questions.length};
+    }
+
+    // Timer
+    let timeLeft = 30;
+    function startTimer() {
+      const interval = setInterval(() => {
+        timeLeft--;
+        timerSpan.textContent = Time: ${timeLeft}s;
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          calculateScore();
+          document.getElementById('submitBtn').disabled = true;
+          timerSpan.textContent = '⏱ Time\'s up!';
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
