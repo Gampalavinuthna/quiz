@@ -40,11 +40,19 @@
       color: #ff0000;
       font-weight: bold;
     }
+    #username {
+      margin-bottom: 15px;
+      padding: 8px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>📘 Quiz Time <span id="timer">Time: 30s</span></h2>
+    <input type="text" id="username" placeholder="Enter your name" required />
     <form id="quizForm"></form>
     <button id="submitBtn">Submit</button>
     <h3 id="result"></h3>
@@ -84,6 +92,12 @@
     };
 
     function calculateScore() {
+      const name = document.getElementById('username').value;
+      if (!name) {
+        alert("Please enter your name first!");
+        return;
+      }
+
       let score = 0;
       questions.forEach((q, index) => {
         const selected = document.querySelector(input[name="q${index}"]:checked);
@@ -91,7 +105,14 @@
           score++;
         }
       });
-      result.innerHTML = ✅ You scored ${score} out of ${questions.length};
+
+      fetch('/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, score: score })
+      }).then(res => res.json()).then(data => {
+        result.innerHTML = ✅ ${name}, you scored ${score} out of ${questions.length};
+      });
     }
 
     // Timer
